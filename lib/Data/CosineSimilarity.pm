@@ -2,7 +2,7 @@ package Data::CosineSimilarity;
 use strict;
 use warnings;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 =head1 NAME
 
@@ -16,8 +16,8 @@ Data::CosineSimilarity - Computes the Cosine Similarity
  $cs->add( label3 => ... );
 
  # computes the cosine similarity
- my $r = $cs->similarity( 'label1', 'label2' ); 
- 
+ my $r = $cs->similarity( 'label1', 'label2' );
+
  # the result object
  my $cosine = $r->cosine;
  my $radian = $r->radian;
@@ -26,22 +26,30 @@ Data::CosineSimilarity - Computes the Cosine Similarity
 
  # computes all the cosine similarity between 'label1' and the others.
  my @all = $cs->all_for_label('label1');
- 
+
  # computes all, and returns the best
  my ($best_label, $r) = $cs->best_for_label('label2');
 
  # computes all, and returns the worst
  my ($worst_label, $r) = $cs->worst_for_label('label2');
- 
+
 =head1 DESCRIPTION
 
-=head2 $class->new
+=head2 $class->new( %opts )
+
+If all the feature vectors are normed then the computation of the cosine
+becomes just the dot product of the vectors. In this case, specify the
+option normed => 1, the performance will be greatly improved.
 
 =cut
 
 sub new {
     my $class = shift;
-    return bless {}, $class;
+    my %opts = @_;
+    return bless {
+        normed => $opts{normed} ? 1 : 0,
+        labels => {},
+    }, $class;
 }
 
 =head2 $self->add( label => $features )
@@ -58,10 +66,11 @@ sub add {
     die 'features must contain terms'
         unless keys %$features;
 
-    my $norm = _euclidean_norm($features)
-        or die 'euclidean norm is null';
+    my $norm = $self->{normed} ? 1 : _euclidean_norm($features);
 
-    $self->{$label} = {
+    die 'euclidean norm is null' if $norm == 0;
+
+    $self->{labels}{$label} = {
         features => $features,
         norm => $norm,
     };
@@ -69,23 +78,21 @@ sub add {
 
 sub _euclidean_norm {
     my ($features) = @_;
-    my $sum;
+    my $sum = 0;
     $sum += $_**2 for values %$features;
     return sqrt $sum;
 }
 
 sub _scalar_product {
     my ($features1, $features2) = @_;
-    my $union = { %$features1, %$features2 };
-    my @dims = keys %$union;
     my $product = 0;
-    for (@dims) {
-        my $c1 = $features1->{$_} or next;
+    for (keys %$features1) {
+        my $c1 = $features1->{$_};
         my $c2 = $features2->{$_} or next;
         $product += $c1 * $c2;
     }
     return $product;
-} 
+}
 
 =head2 $self->similarity( $label1, $label2 )
 
@@ -94,11 +101,20 @@ sub _scalar_product {
 sub similarity {
     my $self = shift;
     my ($label1, $label2) = @_;
+
     my $product = _scalar_product(
-        $self->{$label1}{features},
-        $self->{$label2}{features}
+        $self->{labels}{$label1}{features},
+        $self->{labels}{$label2}{features}
     );
-    my $cosine = $product / ( $self->{$label1}{norm} * $self->{$label2}{norm} );
+
+    my $cosine;
+    if ($self->{normed}) {
+        $cosine = $product;
+    }
+    else {
+        $cosine = $product / ( $self->{labels}{$label1}{norm} * $self->{labels}{$label2}{norm} );
+    }
+
     return Data::CosineSimilarity::Result->_new(
         labels => [ $label1, $label2 ],
         cosine => $cosine,
@@ -113,7 +129,7 @@ sub all_for_label {
     my $self = shift;
     my ($label) = @_;
     my @result;
-    for (keys %$self) {
+    for (keys %{ $self->{labels} }) {
         next if $_ eq $label;
         push @result, $self->similarity($label, $_);
     }
