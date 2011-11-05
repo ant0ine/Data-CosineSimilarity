@@ -1,5 +1,5 @@
 NAME
-    Data::CosineSimilarity - Computes the Cosine Similarity
+    Data::CosineSimilarity - Compute the Cosine Similarity
 
 SYNOPSIS
      $cs = Data::CosineSimilarity->new;
@@ -26,6 +26,8 @@ SYNOPSIS
      my ($worst_label, $r) = $cs->worst_for_label('label2');
 
 DESCRIPTION
+    Compute the cosine similarities between a set of vectors.
+
   $class->new( %opts )
     If all the feature vectors are normed then the computation of the cosine
     becomes just the dot product of the vectors. In this case, specify the
@@ -40,11 +42,6 @@ AUTHOR
     Antoine Imbert, "<antoine.imbert at gmail.com>"
 
 LICENSE AND COPYRIGHT
-    Copyright 2011 Antoine Imbert.
-
-    This program is free software; you can redistribute it and/or modify it
-    under the terms of either: the GNU General Public License as published
-    by the Free Software Foundation; or the Artistic License.
-
-    See http://dev.perl.org/licenses/ for more information.
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
 

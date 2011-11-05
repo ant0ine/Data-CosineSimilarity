@@ -6,7 +6,7 @@ our $VERSION = 0.02;
 
 =head1 NAME
 
-Data::CosineSimilarity - Computes the Cosine Similarity
+Data::CosineSimilarity - Compute the Cosine Similarity
 
 =head1 SYNOPSIS
 
@@ -34,6 +34,8 @@ Data::CosineSimilarity - Computes the Cosine Similarity
  my ($worst_label, $r) = $cs->worst_for_label('label2');
 
 =head1 DESCRIPTION
+
+Compute the cosine similarities between a set of vectors.
 
 =head2 $class->new( %opts )
 
@@ -188,13 +190,7 @@ Antoine Imbert, C<< <antoine.imbert at gmail.com> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2011 Antoine Imbert.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
-
-See http://dev.perl.org/licenses/ for more information.
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut
 
