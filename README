@@ -8,8 +8,8 @@ SYNOPSIS
      $cs->add( label3 => ... );
 
      # computes the cosine similarity
-     my $r = $cs->similarity( 'label1', 'label2' ); 
- 
+     my $r = $cs->similarity( 'label1', 'label2' );
+
      # the result object
      my $cosine = $r->cosine;
      my $radian = $r->radian;
@@ -18,7 +18,7 @@ SYNOPSIS
 
      # computes all the cosine similarity between 'label1' and the others.
      my @all = $cs->all_for_label('label1');
- 
+
      # computes all, and returns the best
      my ($best_label, $r) = $cs->best_for_label('label2');
 
@@ -26,7 +26,11 @@ SYNOPSIS
      my ($worst_label, $r) = $cs->worst_for_label('label2');
 
 DESCRIPTION
-  $class->new
+  $class->new( %opts )
+    If all the feature vectors are normed then the computation of the cosine
+    becomes just the dot product of the vectors. In this case, specify the
+    option normed => 1, the performance will be greatly improved.
+
   $self->add( label => $features )
   $self->similarity( $label1, $label2 )
   $self->all_for_label( $label )
